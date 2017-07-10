@@ -1,7 +1,10 @@
-TITLE Program 1     (Program1.asm)
+TITLE Program 1 Elementary Arithmetic    (Project1.asm)
 
 ; Author: Alexander Miranda
-; CS 271 / Project 1                 Date: 07/05/2017
+; Email: miranale@oregonstate.edu
+; Class/Section: CS 271-400
+; Assignment: Program 1                 
+; Due Date: 07/09/2017
 ; Description: This program will take two numbers as input and output the results of various operations
 ; to the user
 
@@ -13,7 +16,7 @@ INCLUDE Irvine32.inc
 
 ; Instructional strings
 
-intro			BYTE	"Program 1 by Alexander Miranda",0
+intro			BYTE	"Elementary Arithmetic by Alexander Miranda",0
 instruct1		BYTE    "Enter 2 numbers, and I'll show you the sum, difference,",0
 instruct2		BYTE	"product, quotient, and remainder.",0
 prompt1			BYTE    "Please enter the first number here: ",0
@@ -29,7 +32,7 @@ farewell		BYTE	"That was fun! Goodbye!",0
 
 ecPrompt1		BYTE	"**EC: Program loops until user chooses to exit",0
 ecPrompt2		BYTE	"**EC: Program validates the second number is less than the first",0
-ecPrompt3		BYTE	"**EC: Program calcultes and displays the quotient as a floating-point number",0
+ecPrompt3		BYTE	"**EC: Program calculates and displays the quotient as a floating-point number",0
 
 ; Error output strings
 
@@ -223,6 +226,13 @@ ContinueCalc:
 	call	CrLf
 
 ; Extra credit for floating point result from division
+
+; Outputting the ec prompt three
+
+	mov			edx, OFFSET ecPrompt3
+	call	WriteString
+	call	CrLf
+	call	CrLf
 
 ; Outputting the division equation again
 
