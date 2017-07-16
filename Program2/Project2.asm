@@ -27,26 +27,26 @@ NAME_MAX_LEN = 25
 
 programName			BYTE	"Fibonacci Numbers",0
 authorAttr			BYTE	"Programmed by Alexander Miranda",0
-userNamePrompt		BYTE	"What's your name? ",0
+userNameMsg			BYTE	"What's your name? ",0
 greeting			BYTE	"Hello, ",0
 instruct1			BYTE	"Enter the number of Fibonacci terms to be displayed",0
 instruct2			BYTE	"Give the number as an integer in the range [",0
 instruct3			BYTE	" .. ",0
 instruct4			BYTE	"].",0
-fibNumPrompt		BYTE	"How many Fibonacci terms do you want? ",0
+fibNumMsg			BYTE	"How many Fibonacci terms do you want? ",0
 fibNumErr1			BYTE	"Out of range.  Enter a number in [",0
 fibNumErr2			BYTE	"]",0
 fullStop			BYTE	".",0
-bigWhiteSpace		BYTE	9,9,0
+whiteSpace			BYTE	9,9,0
 certMsg				BYTE	"Results certified by Alexander Miranda.",0
 farewell			BYTE	"Goodbye, ",0
 repeatMsg			BYTE	"Enter 1 to run again 0 to exit: ",0
 
 ; Extra credit prompts
 
-columnsEcPrompt		BYTE	"**EC: Program displays the numbers in aligned columns.",0
-repeatEcPrompt		BYTE	"**EC: User can decide to run the program again",0
-errColorPrompt		BYTE	"**EC: Error output messages are colored red",0	
+columnsEc			BYTE	"**EC: Program displays the numbers in aligned columns.",0
+repeatEc			BYTE	"**EC: User can decide to run the program again",0
+errColorEc			BYTE	"**EC: Error output messages are colored red",0	
 
 ; Variable definitions:
 
@@ -72,19 +72,19 @@ introduction:
 	call	CrLf
 
 ; Output the extra credit prompts
-	mov			edx, OFFSET columnsEcPrompt
+	mov			edx, OFFSET columnsEc
 	call	WriteString
 	call	CrLf
-	mov			edx, OFFSET repeatEcPrompt
+	mov			edx, OFFSET repeatEc
 	call	WriteString
 	call	CrLf
-	mov			edx, OFFSET errColorPrompt
+	mov			edx, OFFSET errColorEc
 	call	WriteString
 	call	CrLf
 	call	CrLf
 
 ; Grab the user's inputted name
-	mov			edx, OFFSET userNamePrompt
+	mov			edx, OFFSET userNameMsg
 	call	WriteString
 	mov			ecx, 32
 	mov			edx, OFFSET userName
@@ -141,7 +141,7 @@ validationError:
 ; Get the number of Fibonacci terms to display from the user
 
 getNumOfFibTermsFromUser:
-	mov			edx, OFFSET fibNumPrompt
+	mov			edx, OFFSET fibNumMsg
 	call	WriteString
 	call	readInt
 	mov			fibTerms, eax
@@ -179,7 +179,7 @@ rowFormatting:
 	cmp			ecx, 1
 	je			outputNewLine
 	mov			placeholder, edx
-	mov			edx, OFFSET bigWhiteSpace
+	mov			edx, OFFSET whiteSpace
 	call	WriteString
 	mov			edx, placeholder
 
