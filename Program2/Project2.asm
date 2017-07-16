@@ -25,35 +25,35 @@ NAME_MAX_LEN = 25
 
 ; Constant output strings:
 
-programName		BYTE	"Fibonacci Numbers",0
-authorAttr		BYTE	"Programmed by Alexander Miranda",0
-userNamePrompt	BYTE	"What's your name? ",0
-greeting		BYTE	"Hello, ",0
-instruct1		BYTE	"Enter the number of Fibonacci terms to be displayed",0
-instruct2		BYTE	"Give the number as an integer in the range [",0
-instruct3		BYTE	" .. ",0
-instruct4		BYTE	"].",0
-fibNumPrompt	BYTE	"How many Fibonacci terms do you want? ",0
-fibNumErr1		BYTE	"Out of range.  Enter a number in [",0
-fibNumErr2		BYTE	"]",0
-fullStop		BYTE	".",0
-bigWhiteSpace	BYTE	9,9,0
-certMsg			BYTE	"Results certified by Alexander Miranda.",0
-farewell		BYTE	"Goodbye, ",0
-repeatMsg		BYTE	"Enter 1 to run again 0 to exit: ",0
+programName			BYTE	"Fibonacci Numbers",0
+authorAttr			BYTE	"Programmed by Alexander Miranda",0
+userNamePrompt		BYTE	"What's your name? ",0
+greeting			BYTE	"Hello, ",0
+instruct1			BYTE	"Enter the number of Fibonacci terms to be displayed",0
+instruct2			BYTE	"Give the number as an integer in the range [",0
+instruct3			BYTE	" .. ",0
+instruct4			BYTE	"].",0
+fibNumPrompt		BYTE	"How many Fibonacci terms do you want? ",0
+fibNumErr1			BYTE	"Out of range.  Enter a number in [",0
+fibNumErr2			BYTE	"]",0
+fullStop			BYTE	".",0
+bigWhiteSpace		BYTE	9,9,0
+certMsg				BYTE	"Results certified by Alexander Miranda.",0
+farewell			BYTE	"Goodbye, ",0
+repeatMsg			BYTE	"Enter 1 to run again 0 to exit: ",0
 
 ; Extra credit prompts
 
-columnsEcPrompt	BYTE	"**EC: Program displays the numbers in aligned columns.",0
-repeatEcPrompt	BYTE	"**EC: User can decide to run the program again",0
-errColorPrompt	BYTE	"**EC: Error output messages are colored red",0	
+columnsEcPrompt		BYTE	"**EC: Program displays the numbers in aligned columns.",0
+repeatEcPrompt		BYTE	"**EC: User can decide to run the program again",0
+errColorPrompt		BYTE	"**EC: Error output messages are colored red",0	
 
 ; Variable definitions:
 
-userName		BYTE	NAME_MAX_LEN + 1 DUP(0) ;variable that stores the name the user inputs for themselves
-fibTerms		DWORD	?	;variable that stores the desired number of Fibonacci terms from the user
-fibNum			DWORD	?	;variable that holds the current Fibonacci term to be printed
-placeholder		DWORD	?	;variable that holds the current Fibonacci term so white
+userName			BYTE	NAME_MAX_LEN + 1 DUP(0) ;variable that stores the name the user inputs for themselves
+fibTerms			DWORD	?	;variable that stores the desired number of Fibonacci terms from the user
+fibNum				DWORD	?	;variable that holds the current Fibonacci term to be printed
+placeholder			DWORD	?	;variable that holds the current Fibonacci term so white
 								;space can be outputted to the screen using the edx register
 								;without losing the current Fibonacci int
 
