@@ -75,6 +75,7 @@ COMMENT @
 Output a welcome message and input instructions to the user
 parameters: none
 return: none
+preconditions: none
 registers altered: edx
 @
 introduction	PROC
@@ -108,6 +109,7 @@ COMMENT @
 Prompting the user for the number of terms they want to see and storing that number
 parameters: none
 return: number of composites to be outputted, inputted by the user if it passes validation
+preconditions: none
 registers altered: eax, edx, edx
 @
 getNumOfCompTerms	PROC
@@ -140,7 +142,8 @@ getNumOfCompTerms ENDP
 COMMENT @
 Method that validates the user inputted number for number of composites to display
 parameters: userInput which is in the eax register when this method is evaluated
-return: none
+return: assigns 0 to ebx if invalid, assigns 1 to ebx otherwise
+preconditions: none
 registers altered: ebx
 @
 validateInput	PROC
@@ -171,6 +174,7 @@ COMMENT @
 Method that outputs the error message to the user when they enter improper input
 parameters: none
 return: none
+preconditions: The user input given previously was invalid
 registers altered: eax, edx
 @
 validationError		PROC
@@ -192,6 +196,7 @@ COMMENT @
 Method to determine if a number is a composite or not
 parameters: compTerm is passed in with a global scope
 return: sets 0 in eax if the number is a composite and 1 otherwise
+preconditions: compTerm must have a valid integer value
 registers altered: eax, ebx, ecx, edx
 @
 isComp		PROC
@@ -232,6 +237,7 @@ COMMENT @
 Method that prints the composite numbers on the screen to the user
 parameters: userInput and userInputTmp are global variables read and manipulated in the method
 return: The output of the number of composites specified by the user
+preconditions: none
 registers altered: eax, ebx, ecx, edx
 @
 outputComposites	PROC
@@ -297,6 +303,7 @@ COMMENT @
 Method to output goodbye to the user
 parameters: none
 return: none
+preconditions: none
 registers altered: edx
 @
 sayGoodbye	PROC
