@@ -250,6 +250,8 @@ foundComp:
 	mov			eax, compTerm
 	call	WriteDec
 	dec			spaceCount
+	cmp			spaceCount, 0
+	je		newRow
 	jmp		formatting
 
 newRow:
