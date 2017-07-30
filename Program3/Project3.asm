@@ -48,10 +48,14 @@ rngErrMsg			BYTE	"Out of range.	Try again.",0
 
 certMsg				BYTE	"Results certified by Alexander Miranda.  Goodbye.",0
 
+; Extra credit prompt(s)
+
+ecPrompt1			BYTE	"**EC: Aligned the output columns",0
+
 ; (insert variable definitions here)
 
 userInput			DWORD	?	; variable that stores the user inputted desired number of composite terms
-userInputTmp		DWORD	?	; additional storage variable for user inputted number, helping with spacing
+userInTmp			DWORD	?	; additional storage variable for user inputted number, helping with spacing
 compTerm			DWORD	?	; placeholder for composite number to be displayed in loop
 countPH				DWORD	?	; loop counter placeholder variable
 spaceCount			DWORD	?	; variable that holds the space count, initialized with SPACE_COUNT	
@@ -77,6 +81,10 @@ introduction	PROC
 
 ; Introduction for the user
 	mov			edx, OFFSET programHead
+	call	WriteString
+	call	CrLf
+	call	CrLf
+	mov			edx, OFFSET ecPrompt1
 	call	WriteString
 	call	CrLf
 	call	CrLf
@@ -231,7 +239,7 @@ outputComposites	PROC
 	mov			compTerm, 0
 	mov			eax, userInput
 	dec			eax
-	mov			userInputTmp, eax
+	mov			userInTmp, eax
 
 	; Initializing spaceCount with SPACE_COUNT
 	mov			eax, SPACE_COUNT
@@ -251,8 +259,8 @@ foundComp:
 	call	WriteDec
 	dec			spaceCount
 	cmp			spaceCount, 0
-	je		newRow
-	jmp		formatting
+	je			newRow
+	jmp			formatting
 
 newRow:
 
@@ -264,7 +272,7 @@ newRow:
 formatting:
 
 	mov			eax, countPH
-	cmp			eax, userInputTmp
+	cmp			eax, userInTmp
 	je			newRow
 	mov			edx, OFFSET spaceChar
 	call	WriteString
