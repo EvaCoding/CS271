@@ -58,39 +58,39 @@ numArray		DWORD	MAX_INPUT		DUP(?)
 main PROC
 	call		Randomize
 
-	push		OFFSET intro1
+	push		OFFSET intro1			; pushing references of intro prompts to the stack prior to introduce PROC call
 	push		OFFSET intro2
 	push		OFFSET intro3
 	push		OFFSET intro4
 	call		introduce
 
-	push		OFFSET errMsg
-	push		OFFSET prompt1
+	push		OFFSET errMsg			; pushing references of errMsg, prompt1, prompt2, and user inputted number
+	push		OFFSET prompt1			; (numNeeded) to the system stack prior to grabInput PROC call
 	push		OFFSET prompt2
 	push		OFFSET numNeeded
 	call		grabInput
 
-	push		OFFSET numArray
-	push		numNeeded
+	push		OFFSET numArray			; pushing the reference to the numArray and the value of numNeeded
+	push		numNeeded				; onto the system stack prior to the populateArray PROC call
 	call		populateArray
 
-	push		OFFSET unsortedMsg
-	push		OFFSET numArray
-	push		numNeeded
+	push		OFFSET unsortedMsg		; pushing references to the unsortedMsg, the numArray and
+	push		OFFSET numArray			; the value of numNeeded to the system stack prior
+	push		numNeeded				; to the printArray PROC call
 	call		printArray
 
-	push		OFFSET numArray
-	push		numNeeded
+	push		OFFSET numArray			; pushing the reference to numArray and the value of numNeeded
+	push		numNeeded				; to the system stack prior to the call of PROC sortArray
 	call		sortArray
 
-	push		OFFSET medianMsg
-	push		OFFSET numArray
-	push		numNeeded
+	push		OFFSET medianMsg		; pushing the references of medianMsg and numArray to the system
+	push		OFFSET numArray			; stack as well as the value of numNeeded prior to the 
+	push		numNeeded				; printMedian PROC call
 	call		printMedian
 
-	push		OFFSET sortedMsg
-	push		OFFSET numArray
-	push		numNeeded
+	push		OFFSET sortedMsg		; pushing references of sortedMsg and numArray along with the
+	push		OFFSET numArray			; value of numNeeded to the system stack prior to the
+	push		numNeeded				; printArray PROC call
 	call		printArray
 
 	exit
@@ -105,26 +105,26 @@ registers changed: edx
 @
 introduce	PROC
 
-	pushad
+	pushad							; pushing 32-bit registers onto the stack
 	mov			ebp, esp
 
-	mov			edx, [ebp + 48]
-	call	WriteString
+	mov			edx, [ebp + 48]		; assigning edx the ref to intro1
+	call	WriteString				; outputting intro1
 	call	CrLf
 
-	mov			edx, [ebp + 44]
-	call	WriteString
+	mov			edx, [ebp + 44]		; assigning edx the ref to intro2
+	call	WriteString				; outputting intro2
 	call	CrLf
-	mov			edx, [ebp + 40]
-	call	WriteString
+	mov			edx, [ebp + 40]		; assigning edx the ref to intro3
+	call	WriteString				; outputting intro3
 	call	CrLf
-	mov			edx, [ebp + 36]
-	call	WriteString
+	mov			edx, [ebp + 36]		; assiging edx the ref to intro4
+	call	WriteString				; outputting intro4
 
 	call	CrLf
 	call	CrLf
 
-	popad
+	popad							; popping 32-bit registers off the stack
 	ret		16
 
 introduce	ENDP
@@ -138,15 +138,15 @@ registers changes: eax, ebx, edx
 @
 grabInput	PROC
 
-	push	ebp
+	push	ebp					; initializing stack frame
 	mov			ebp, esp
-	mov			ebx, [ebp + 8]
+	mov			ebx, [ebp + 8]	; assign ebx the reference to numNeeded
 	
 grabNum:
 
-	mov			edx, [ebp + 16]
+	mov			edx, [ebp + 16]	; assigning edx the reference to prompt1
 	call	WriteString
-	mov			eax, MIN_INPUT
+	mov			eax, MIN_INPUT	; outputting the min acceptable user input for numNeeded
 	call	WriteDec
 	mov			al, ' '
 	call	WriteChar
@@ -155,12 +155,13 @@ grabNum:
 	call	WriteChar
 	mov			al, ' '
 	call	WriteChar
-	mov			eax, MAX_INPUT
+	mov			eax, MAX_INPUT	; outputting the max acceptable user input for numNeeded
 	call	WriteDec
-	mov			edx, [ebp + 12]
+	mov			edx, [ebp + 12]	; assigning edx the reference to prompt2
 	call	WriteString
-	call	ReadInt
+	call	ReadInt				; taking the user's input into the eax register
 
+	; Validation block to ensure the user's input is in the desired range
 	cmp			eax, MIN_INPUT
 	jl			invalidNum
 	cmp			eax, MAX_INPUT
@@ -169,15 +170,15 @@ grabNum:
 
 invalidNum:
 
-	mov			edx, [ebp + 20]
+	mov			edx, [ebp + 20]	; assigning edx the reference to errMsg
 	call	WriteString
 	call	CrLf
-	jmp		grabNum
+	jmp		grabNum				; asking the user for input again
 
 validNum:
 
-	mov			[ebx], eax
-	pop			ebp
+	mov			[ebx], eax		; assigning the value of eax to be the value at the ebx register
+	pop			ebp				; which references numNeeded currently
 	
 	ret			16
 
@@ -193,22 +194,22 @@ registers changed: eax, ebx, ecx, edx, edi
 @
 populateArray		PROC
 
-	push	ebp
+	push	ebp						; initialize the stack frame
 	mov			ebp, esp
-	mov			ecx, [ebp + 8]
-	mov			edi, [ebp + 12]
-	mov			ebx, LOWER_BOUND
-	mov			edx, UPPER_BOUND
+	mov			ecx, [ebp + 8]		; assigning value of numNeeded to ecx (for the loop)
+	mov			edi, [ebp + 12]		; assigning address of numArray to edi
+	mov			ebx, LOWER_BOUND	; assigning value of LOWER_BOUND to ebx
+	mov			edx, UPPER_BOUND	; assigning value of UPPER_BOUND to edx
 	inc			edx
-	sub			edx, ebx
+	sub			edx, ebx			; calculation to assign edx to be equal to UPPER_BOUND - LOWER_BOUND + 1
 
 generateRandInt:
 
-	mov			eax, edx
-	call	RandomRange
-	add			eax, LOWER_BOUND
-	mov			[edi], eax
-	add			edi, 4
+	mov			eax, edx			; assign random number to eax
+	call	RandomRange				; generate a pseudo-random number
+	add			eax, LOWER_BOUND	; bump up the random number in eax so it is within the range of LOWER_BOUND and UPPER_BOUND
+	mov			[edi], eax			; enter the random number into numArray
+	add			edi, 4				; move to next index in the numArray
 	loop	generateRandInt
 	pop			ebp
 	ret			8
@@ -227,35 +228,35 @@ printArray	PROC
 
 	push	ebp
 	mov			ebp, esp
-	mov			ecx, 0
-	mov			ebx, 0
-	mov			esi, [ebp + 12]
-	mov			edx, [ebp + 16]
-	call	CrLf
+	mov			ecx, 0				; initializing to track element count
+	mov			ebx, 0				; initializing to track white space count
+	mov			esi, [ebp + 12]		; assigning the reference to numArray to esi
+	mov			edx, [ebp + 16]		; assigning the reference to unsortedMsg which serves as the
+	call	CrLf						; title
 	call	WriteString
 	call	CrLf
 
 printRow:
 
-	mov			eax, [esi + ecx * 4]
-	call	WriteDec
-	inc			ebx
-	cmp			ebx, ELEMS_PER_ROW
-	je			newRow
-	mov			al, 9
+	mov			eax, [esi + ecx * 4]	; assigning the value referenced on the stack (in numArray) to eax
+	call	WriteDec					; outputting element of array to user
+	inc			ebx						; increasing element count by one
+	cmp			ebx, ELEMS_PER_ROW		; comparing elements displayed in current row to the total num of elements
+	je			newRow						; per row, if equal will jump to newRow
+	mov			al, 9					; will output a tab char otherwise
 	call	WriteChar
 
 mainLoop:
 	
-	inc			ecx
-	cmp			ecx, [ebp + 8]
-	jne			printRow
-	jmp			return
-
+	inc			ecx						; incrementing the value in ecx
+	cmp			ecx, [ebp + 8]			; compare the number of elements printed to the count requested (numNeeded)
+	jne			printRow				; if the count does not match jump to print another row of numbers
+	jmp			return					; otherwise jump to return because all elements of the array have been
+											; outputted
 newRow:
 
 	call	CrLf
-	sub			ebx, ELEMS_PER_ROW
+	sub			ebx, ELEMS_PER_ROW		; resetting ebx to 0
 	jmp			mainLoop
 
 return:
@@ -277,10 +278,10 @@ registers changed: eax, ebx, ecx, edx, edi
 @
 sortArray	PROC
 
-	push	ebp
+	push	ebp							; initialize stack frame
 	mov			ebp, esp
-	mov			ecx, 0
-	mov			edi, [ebp + 12]
+	mov			ecx, 0					; initialize loop counter
+	mov			edi, [ebp + 12]			; assigning reference to array to edi
 
 start:
 	mov			eax, ecx
@@ -289,12 +290,12 @@ start:
 innerLoop:
 
 	inc			ebx
-	cmp			ebx, [ebp + 8]
-	je			outerLoop
-	mov			edx, [edi + ebx * 4]
-	cmp			edx, [edi + eax * 4]
-	jl			innerLoop
-	pushad
+	cmp			ebx, [ebp + 8]			; comparing number of elements sorted to numNeeded
+	je			outerLoop				; if equal breaks out to the outer loop
+	mov			edx, [edi + ebx * 4]	; comparing a pair of elements whereas it is arr[j] to arr[i]
+	cmp			edx, [edi + eax * 4]	
+	jl			innerLoop				; if arr[i] is less jump back to the inner loop
+	pushad								; push register values onto stack to save them
 	mov			esi, [ebp + 12]
 	mov			ecx, 4
 	mul			ecx
@@ -304,15 +305,15 @@ innerLoop:
 	mul			ecx
 	add			edi, eax
 	push	edi
-	call	swapIndices
-	popad
+	call	swapElements				; if arr[i] is greater swap it with arr[j]
+	popad								; reinitialize the register values prior to pushad
 	jmp			innerLoop
 
 outerLoop:
 
 	inc			ecx
 	cmp			ecx, [ebp + 8]
-	je			return
+	je			return					; returns if all elements have been sorted
 	jmp			start
 
 return:
@@ -336,26 +337,26 @@ printMedian		PROC
 	mov			edi, [ebp + 12]
 	mov			edx, [ebp + 16]
 	call	WriteString
-	mov			eax, [ebp + 8]
+	mov			eax, [ebp + 8]		; assigning value of numNeeded to eax
 	cdq
 	mov			ebx, 2
-	div			ebx
-	cmp			edx, 0
-	je			evenLength
+	div			ebx					; dividing numNeeded by 2
+	cmp			edx, 0				; if edx equals 0 numNeeded was even
+	je			evenLength			; jump to evenLength if edx == 0
 
 oddLength:
 
-	mov			ebx, [edi + eax * 4]
-	mov			eax, ebx
+	mov			ebx, [edi + eax * 4]	; when numNeeded is odd print the middle element
+	mov			eax, ebx					; in numArray
 	call	WriteDec
 	mov			al, '.'
 	call	WriteChar
 	jmp			return
 
 evenLength:
-
-	dec			eax
-	mov			ebx, [edi + eax * 4]
+										; if number of array elements are even the middle two will be summed 					
+	dec			eax						; and the sum will be divided by in half (by 2)
+	mov			ebx, [edi + eax * 4]	; then displayed to the user
 	inc			eax
 	mov			ecx, [edi + eax * 4]
 	mov			eax, ebx
@@ -382,21 +383,21 @@ returns: the values of the swapped elements
 preconditions: an array of at least two elements in length
 registers changed: edx, edi, esi, ecx
 @
-swapIndices		PROC
+swapElements		PROC
 
-	push	ebp
+	push	ebp						; initialize stack frame
 	mov			ebp, esp
-	mov			esi, [ebp + 12]
-	mov			edi, [ebp + 8]
-	mov			edx, [edi]
-	mov			ecx, [esi]
-	mov			[edi], ecx
-	mov			[esi], edx
-	pop			ebp
+	mov			esi, [ebp + 12]		; assigning address of first element to esi
+	mov			edi, [ebp + 8]		; assigning address of second element to edi
+	mov			edx, [edi]			; storing address of edi in edx
+	mov			ecx, [esi]			; storing address of esi in ecx
+	mov			[edi], ecx			; assigning address in ecx to edi (swapping first to second element address)
+	mov			[esi], edx			; assigning address in edx to esi (swapping second element to first element address)
+	pop			ebp					; restore the stack
 
 	ret		8
 
-swapIndices		ENDP
+swapElements		ENDP
 
 
 END main
