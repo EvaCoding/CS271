@@ -1,4 +1,4 @@
-TITLE Program 4 Template     (Project4.asm)
+TITLE Program 4 Sorting Random Integers     (Project4.asm)
 
 ; Author: Alexander Miranda
 ; Email: miranale@oregonstate.edu
