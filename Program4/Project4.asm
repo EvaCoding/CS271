@@ -40,7 +40,7 @@ intro3			BYTE	"],",13,10,0
 errMsg			BYTE	"Invalid input",0
 medMsg			BYTE	"The median is ",0
 sortMsg			BYTE	"The sorted list: ",0
-prompt			BYTE	"How many numbers should be generated? [",0
+prompt1			BYTE	"How many numbers should be generated? [",0
 prompt2			BYTE	"]: ",0
 unsortedMsg		BYTE	"The unsorted random numbers: ",0
 medianMsg		BYTE	"The median is ",0
@@ -64,7 +64,7 @@ main PROC
 	call		introduce
 
 	push		OFFSET errMsg
-	push		OFFSET prompt
+	push		OFFSET prompt1
 	push		OFFSET prompt2
 	push		OFFSET numNeeded
 	call		grabInput
@@ -95,7 +95,13 @@ main PROC
 	exit
 main ENDP
 
-
+COMMENT @
+Introduce the program to the user.
+parameters: intro1, intro2, intro3 on the stack
+returns: none
+preconditions: none
+registers changed: eax, edx
+@
 introduce	PROC
 
 	push	ebp
@@ -129,6 +135,13 @@ introduce	PROC
 
 introduce	ENDP
 
+COMMENT @
+Method that grabs the number of random numbers to generate from user input
+parameters: errMsg, prompt1, prompt2, numNeeded from the stack
+returns: the number inputted by the user
+preconditions: none
+registers changes: eax, ebx, edx
+@
 grabInput	PROC
 
 	push	ebp
@@ -176,6 +189,14 @@ validNum:
 
 grabInput	ENDP
 
+COMMENT @
+This method creates the random numbers and enters them into an array
+of a size the user designates
+parameters: reference to the array and the value of numNeeded
+returns: an array of size the user specifies that contains random numbers
+preconditions: numNeeded is in the range specified by LOWER_BOUND and UPPER_BOUND
+registers changed: eax, ebx, ecx, edx, edi
+@
 populateArray		PROC
 
 	push	ebp
@@ -200,6 +221,14 @@ generateRandInt:
 
 populateArray	ENDP
 
+COMMENT @
+Method to display the numbers in the array to the user
+parameters: reference to the array, numNeeded both on the system's stack
+returns: prints the elements of the array to the user
+preconditions: numNeeded is set to a value between LOWER_BOUND and UPPER_BOUND
+	and the elements of the random array are populated
+registers changed: eax, ebx, ecx, edx, esi
+@
 printArray	PROC
 
 	push	ebp
@@ -244,6 +273,14 @@ return:
 
 printArray	ENDP
 
+COMMENT @
+Method to sort the array in descending order. The algorithm used is selection sort.
+parameters: reference to the array, numNeeded on the system's stack
+returns: an array sorted in descending order
+preconditions: numNeeded is set to a value between LOWER_BOUND and UPPER_BOUND,
+	and the array references an array populated with random numbers
+registers changed: eax, ebx, ecx, edx, edi
+@
 sortArray	PROC
 
 	push	ebp
@@ -291,6 +328,13 @@ return:
 
 sortArray	ENDP
 
+COMMENT @
+Method that prints and displays the median of the array to the user
+parameters: reference to the array, numNeeded value, and medianMsg on the system's stack
+returns: displays the median to the user
+preconditions: numNeeded is populated as well as the sorted array
+registers changed: eax, ebx, ecx, edx, edi
+@
 printMedian		PROC
 
 	push	ebp
@@ -333,7 +377,13 @@ return:
 
 printMedian		ENDP
 
-
+COMMENT @
+Method that swaps two array elements
+parameters: reference of first element, reference of second element on the system's stack
+returns: the values of the swapped elements
+preconditions: an array of at least two elements in length
+registers changed: edx, edi, esi, ecx
+@
 swapIndices		PROC
 
 	push	ebp
