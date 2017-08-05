@@ -33,9 +33,9 @@ ELEMS_PER_ROW = 10
 ; Output string constants
 
 intro1			BYTE	"Sorting Random Integers       Programmed by Alexander Miranda",0
-intro2			BYTE	"This program generates random numbers in the range [",0
-intro3			BYTE	"],",13,10,0
-;intro4			BYTE	"displays the original list, sorts the list, and calculates the,"13,10,"median value. Finally, it displays the list sorted in descending order.",0
+intro2			BYTE	"This program generates random numbers in the range [100 .. 999],",0
+intro3			BYTE	"displays the original list, sorts the list, and calculates the,",0
+intro4			BYTE	"median value. Finally, it displays the list sorted in descending order.",0
 
 errMsg			BYTE	"Invalid input",0
 medMsg			BYTE	"The median is ",0
@@ -61,6 +61,7 @@ main PROC
 	push		OFFSET intro1
 	push		OFFSET intro2
 	push		OFFSET intro3
+	push		OFFSET intro4
 	call		introduce
 
 	push		OFFSET errMsg
@@ -97,41 +98,34 @@ main ENDP
 
 COMMENT @
 Introduce the program to the user.
-parameters: intro1, intro2, intro3 on the stack
+parameters: intro1, intro2, intro3, intro4 on the stack
 returns: none
 preconditions: none
-registers changed: eax, edx
+registers changed: edx
 @
 introduce	PROC
 
-	push	ebp
+	pushad
 	mov			ebp, esp
 
-	mov			edx, [ebp + 16]
+	mov			edx, [ebp + 48]
 	call	WriteString
 	call	CrLf
 
-	mov			edx, [ebp + 12]
+	mov			edx, [ebp + 44]
 	call	WriteString
-	mov			eax, LOWER_BOUND
-	call	WriteDec
-	mov			al, ' '
-	call	WriteChar
-	mov			al, '.'
-	call	WriteChar
-	call	WriteChar
-	mov			al, ' '
-	call	WriteChar
-	mov			eax, UPPER_BOUND
-	call	WriteDec
-	mov			edx, [ebp + 8]
+	call	CrLf
+	mov			edx, [ebp + 40]
+	call	WriteString
+	call	CrLf
+	mov			edx, [ebp + 36]
 	call	WriteString
 
 	call	CrLf
 	call	CrLf
 
-	pop			ebp
-	ret		12
+	popad
+	ret		16
 
 introduce	ENDP
 
@@ -175,7 +169,7 @@ grabNum:
 
 invalidNum:
 
-	mov			edx, [ebp + 16]
+	mov			edx, [ebp + 20]
 	call	WriteString
 	call	CrLf
 	jmp		grabNum
@@ -223,7 +217,7 @@ populateArray	ENDP
 
 COMMENT @
 Method to display the numbers in the array to the user
-parameters: reference to the array, numNeeded both on the system's stack
+parameters: reference to the array, numNeeded both on the system's stack, reference to title
 returns: prints the elements of the array to the user
 preconditions: numNeeded is set to a value between LOWER_BOUND and UPPER_BOUND
 	and the elements of the random array are populated
@@ -333,7 +327,7 @@ Method that prints and displays the median of the array to the user
 parameters: reference to the array, numNeeded value, and medianMsg on the system's stack
 returns: displays the median to the user
 preconditions: numNeeded is populated as well as the sorted array
-registers changed: eax, ebx, ecx, edx, edi
+registers changed: eax, ebx, ecx, edx, edi, al
 @
 printMedian		PROC
 
@@ -354,6 +348,8 @@ oddLength:
 	mov			ebx, [edi + eax * 4]
 	mov			eax, ebx
 	call	WriteDec
+	mov			al, '.'
+	call	WriteChar
 	jmp			return
 
 evenLength:
@@ -367,6 +363,8 @@ evenLength:
 	mov			ebx, 2
 	div			ebx
 	call	WriteDec
+	mov			al, '.'
+	call	WriteChar
 
 return:
 
