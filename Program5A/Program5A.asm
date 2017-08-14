@@ -21,8 +21,8 @@ COMMENT @
 getString	MACRO reference, strLength	
 	push	edx
 	push	ecx
-	mov  	edx, reference
-	mov  	ecx, strLength
+	mov		edx, reference
+	mov		ecx, strLength
 	call 	ReadString
 	pop		ecx
 	pop		edx
@@ -162,8 +162,8 @@ noCommaNeeded:
 
 ; Output the sum to the user
 
-	mov				eax, ebx
-	mov				sum, eax
+	mov			eax, ebx
+	mov			sum, eax
 	displayString	sumMsg
 
 ; Push sum and strTemp paramaters onto the stack
