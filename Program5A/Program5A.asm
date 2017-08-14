@@ -1,6 +1,6 @@
-TITLE Designing low-level I/O procedures     (Program5A.asm)
+TITLE Designing low-level I/O procedures    (Program5A.asm)
 
-; Author: Alexander Miranda
+; Name: Alexander Miranda
 ; Email: miranale@oregonstate.edu
 ; Class/Section: CS 271-400
 ; Assignment: Program 5A
@@ -11,471 +11,339 @@ TITLE Designing low-level I/O procedures     (Program5A.asm)
 
 INCLUDE Irvine32.inc
 
-displayString	MACRO	stringInputPtr
-
+COMMENT @
+  Moves the user's input into a place in memory to be converted later 
+  receives: reference to the inputted string, strLength the number of chars in the input
+  returns: none
+  preconditions: none
+  registers changed: edx, ecx
+@
+getString	MACRO reference, strLength	
 	push	edx
-	mov			edx, OFFSET stringInputPtr
-	call	WriteString
-	pop			edx
-
-ENDM
-
-getString	MACRO	stringInputPtr, stringLength
-
 	push	ecx
+	mov  	edx, reference
+	mov  	ecx, strLength
+	call 	ReadString
+	pop		ecx
+	pop		edx
+ENDM
+
+COMMENT @
+  Displays string stored in an address that is passed as a param
+  receives: stringInput which is what the user entered
+  preconditions: user had to enter an input
+  registers changed: edx
+@
+displayString	MACRO	stringInput
 	push	edx
-	mov			edx, stringInputPtr
-	mov			ecx, stringLength
-	call	ReadString
-	pop			ecx
-	pop			edx
-
-ENDM
-
-readVal	   MACRO	userEntered, intNum
-
-	LOCAL		begin
-	LOCAL		moreNums
-	LOCAL		finish
-
-	pushad
-
-	mov			edx, OFFSET promptNum
+	mov		edx, OFFSET stringInput
 	call	WriteString
-
-begin:
-
-	mov			eax, 0
-	mov			edx, NUM_OF_INPUTS
-	mov			ebx, 0
-
-	getString	userEntered, stringLength
-	mov			ecx, strLength
-	dec			ecx
-	mov			esi, OFFSET userEntered
-
-	cld
-	lodsb
-
-	sub			al, 48
-	cmp			al, 9
-	ja			invalidInput
-
-moreNums:
-	
-	lodsb
-	sub			al, 48
-	cmp			al, 9
-	ja			invalidInput
-	cmp			al, 0
-	jb			invalidInput
-
-	push		eax
-	mov			eax, ebx
-	mov			edx, 10
-	mul			edx
-
-	mov			ebx, eax
-	pop			eax
-
-	add			ebx, eax
-	dec			ecx
-
-	jne			moreNums
-	je			finish
-
-invalidInput:
-
-	mov			edx, OFFSET errMsg
-	call	WriteString
-	jmp			begin
-
-finish:
-
-	mov			intNum, ebx
-	popad
-
+	pop		edx
 ENDM
 
-writeVal	MACRO	intNum, stringIn
+; Constant for number of inputs accepted by the user
 
-	LOCAL	grabInts
-	LOCAL	change
-	LOCAL	grabNums
-	LOCAL	finish
-	LOCAL	zeroHit
-
-	pushad
-
-	cld
-
-	lea			edi, stringIn
-	mov			ecx, (SIZEOF stringIn)
-	mov			al, 0
-	rep			stosb
-
-	mov			eax, intNum
-	mov			ebx, 10
-	mov			ecx, 0
-
-getInts:
-
-	cmp			eax, 0
-	je			change
-	cdq
-	div			ebx
-	inc			ecx
-	jmp			getInts
-
-change:
-
-	cmp			ecx, 0
-	je			zeroHit
-	mov			eax, intNum
-	mov			ebx, 10
-	mov			edi, OFFSET stringIn
-	add			edi, ecx
-	dec			edi
-	std
-
-grabNums:
-
-	cdq
-	div			ebx
-	push	eax
-	mov			eax, edx
-	add			eax, 48
-	stosb
-	pop		eax
-	cmp		eax, 0
-	je		finish
-	jmp		grabNums
-
-zeroHit:
-
-	mov			edi, OFFSET stringIn
-	mov			eax, 48
-	stosb
-
-finish:
-
-	displayString	stringIn
-
-	popad
-
-ENDM
-
-; Program constants
-
-NUM_OF_INPUTS = 10
+; Constant used to extend the program to accept a varying amount of inputs easily configured
+	NUM_OF_INPUTS = 10
 
 .data
 
-; Constant output strings
+	intro1			BYTE	"PROGRAMMING ASSIGNMENT 5A: Designing low-level I/O procedures",0
+	intro2			BYTE	"Written by: Alexander Miranda",0
 
-intro1			BYTE	"PROGRAMMING ASSIGNMENT 5A: Designing low-level I/O procedures",0
-intro2			BYTE	"Written by: Alexander Miranda",0
+	instruct1		BYTE	"Please provide 10 unsigned decimal integers.",0
+	instruct2		BYTE	"Each number needs to be small enough to fit inside a 32 bit register.",0
+	instruct3		BYTE	"After you have finished inputting the raw numbers I will display a list",0
+	instruct4		BYTE	"of the integers, their sum, and their average value.",0
 
-instruct1		BYTE	"Please provide 10 unsigned decimal integers.",0
-instruct2		BYTE	"Each number needs to be small enough to fit inside a 32 bit register.",0
-instruct3		BYTE	"After you have finished inputting the raw numbers I will display a list",0
-instruct4		BYTE	"of the integers, their sum, and their average value.",0
+	promptNum		BYTE	"Please enter an unsigned number: ", 0
 
-promptNum		BYTE	"Please enter an unsigned number: ",0
+	errMsg			BYTE	"ERROR: You did not enter an unsigned number or your number was too big.",0
+	errPrompt		BYTE	"Please try again: ",0
 
-errMsg			BYTE	"ERROR: You did not enter an unsigned number or your number was too big.",0
+	arrDispMsg		BYTE	"You entered the following numbers:",0
+	sumMsg			BYTE	"The sum of these numbers is: ",0
+	avgMsg			BYTE	"The average is: ",0
 
-arrDispMsg		BYTE	"You entered the following numbers:",0
-sumMsg			BYTE	"The sum of these numbers is: ",0
-avgMsg			BYTE	"The average is: ",0
+	farewell		BYTE	"Thanks for playing!",0
 
-farewell		BYTE	"Thanks for playing!",0
+	; Data variables
 
-; Data variables
-
-numArray		DWORD	10	DUP (?)
-userInt			DWORD	?
-userEntered		BYTE	30		DUP (?)
-sum				DWORD	?
-average			DWORD	?
+	dataArray		DWORD	10 DUP(0)
+	sum				DWORD	?
+	average			DWORD	?
+	buffer			BYTE	255 DUP (0)
+	strTemp			BYTE	32 DUP (?)
 
 .code
 main PROC
 
-	push	OFFSET intro1
-	push	OFFSET intro2
-	call	intro
+; Print intro to the user and the program instructions
 
-	push	OFFSET instruct1
-	push	OFFSET instruct2
-	push	OFFSET instruct3
-	push	OFFSET instruct4
-	call	instructUser
-
-	push	OFFSET numArray
-	push	OFFSET userInt
-	push	OFFSET userEntered
-	call	grabInput
-
-	push	OFFSET arrDispMsg
-	push	OFFSET numArray
-	call	outputArray
-
-	push	OFFSET sum
-	push	OFFSET userEntered
-	push	OFFSET sumMsg
-	push	OFFSET numArray
-	call	calculateSum
-
-	push	OFFSET sum
-	push	OFFSET average
-	push	OFFSET avgMsg
-	push	OFFSET numArray
-	call	calculateAverage
-
-	push	OFFSET farewell
-	call	endMessage
-
-	exit	; exit to operating system
-main ENDP
-
-intro	PROC
-
-	push	ebp
-	mov			ebp, esp
-	push	edx
-	mov			edx, [ebp + 12]
-	call	WriteString
+	displayString	intro1
 	call	CrLf
-	mov			edx, [ebp + 8]
-
-	call	WriteString
+	displayString	intro2
+	call	CrLf
+	call	CrLf
+	displayString	instruct1
+	call	CrLf
+	displayString	instruct2
+	call	CrLf
+	displayString	instruct3
+	call	CrLf
+	displayString	instruct4
 	call	CrLf
 	call	CrLf
 
-	pop			edx
-	pop			ebp
+; Set loop controls
 
-	ret 8
+	mov		ecx, NUM_OF_INPUTS
+	mov		edi, OFFSET dataArray
 
-intro	ENDP
+; Prompt the user for numerical input
 
-instructUser	PROC
+promptInput:
 
-	push	ebp
-	mov			ebp, esp
-	push	edx
+	displayString	promptNum
 
-	mov			edx, [ebp + 8]
-	call	WriteString
-	call	CrLf
-	call	CrLf
+; Push address (reference) of buffer onto the stack
 
-	pop			edx
-	pop			ebp
+	push	OFFSET buffer
+	push	SIZEOF buffer
+	call	ReadVal
 
-	ret		4
+; Iterate to the next slot in the array
 
-instructUser	ENDP
+	mov		eax, DWORD PTR buffer
+	mov		[edi], eax
+	add		edi, 4				; Iterating to next slot in dataArray
 
-grabInput	PROC
+; Continue loop if more input is needed (less than NUM_OF_INPUT)
 
-	push	ebp
-	mov			ebp, esp
-
-	push	esi
-	push	ecx
-	push	eax
-	mov			esi, [ebp + 16]
-	mov			ecx, 10
-
-grabNums:
-
-	readVal userEntered, userInt
-
-	mov			eax, userInt
-	mov			[esi], eax
-	add			esi, 4
-	dec			ecx
-	jnz			grabNums
-
+	loop	promptInput
 	call	CrLf
 
-	pop			eax
-	pop			esi
-	pop			ecx
-	pop			ebp
+; Display array contents to the user
 
-	ret		12
+; Initialize the loop variables
 
-grabInput	ENDP
+	mov		ecx, NUM_OF_INPUTS
+	mov		esi, OFFSET dataArray
+	mov		ebx, 0					; For calculating sum of numbers
 
+; Display message to show user what they entered
 
+	displayString	arrDispMsg
+	call			CrLf
 
-outputArray		PROC
+; Calculate the sum and output the number to the user
 
-	push	ebp
-	mov			ebp, esp
+continueSum:
+	mov		eax, [esi]
+	add		ebx, eax				; Adding number in eax to sum total in ebx
 
-	push	edx
-	push	edi
-	push	ebx
-	push	eax
-
-	mov			edx, [ebp + 12]
-	call	WriteString
-	call	CrLf
-
-	mov			edi, [ebp + 8]
-	mov			ebx, 0
-
-traverseArray:
-
-	mov			eax, 4
-	mul			ebx
-	mov			esi, edi
-	add			esi, eax
-
-	writeVal	[esi], userEntered
-	cmp			ebx, 9
-	je			skipComma
+; Push parameters in eax and in strTemp
 
 	push	eax
+	push	OFFSET strTemp
+	call	WriteVal
+	cmp		ecx, 1					; Checking to see if the last number will be printed
+	je		noCommaNeeded
 	mov			al, ','
-
 	call	WriteChar
 	mov			al, ' '
 	call	WriteChar
-	pop			eax
 
-skipComma:
+noCommaNeeded:
 
-	inc			ebx
-	cmp			ebx, 10
-	je			finish
-	jmp			traverseArray
+	add		esi, 4					; Move address to the next number
+	loop	continueSum
+	call	CrLf
 
+; Output the sum to the user
+
+	mov				eax, ebx
+	mov				sum, eax
+	displayString	sumMsg
+
+; Push sum and strTemp paramaters onto the stack
+
+	push	sum
+	push	OFFSET strTemp
+	call	WriteVal
+	call	CrLf
+	
+; Calculating the average of all the numbers inputted
+
+; Empty edx and set ebx to NUM_OF_INPUTS
+
+	mov		ebx, NUM_OF_INPUTS
+	mov		edx, 0
+
+; Divide the sum by NUM_OF_INPUTS
+
+	div		ebx
+
+; Determine if average needs to be rounded up
+
+	mov		ecx, eax
+	mov		eax, edx
+	mov		edx, 2
+	mul		edx
+	cmp		eax, ebx
+	mov		eax, ecx
+	mov		average, eax
+	jb		noNeedToRound
+	inc		eax
+	mov		average, eax
+
+noNeedToRound:
+	displayString	avgMsg
+
+; Push parameters average and strTemp | Call WriteVal
+
+	push	average
+	push	OFFSET strTemp
+	call	WriteVal
+	call	CrLf
+	call	CrLf
+	
+; Display goodbye message
+
+	displayString	farewell
+	call	CrLf
+
+	exit		; exit to operating system
+main ENDP
+
+COMMENT @
+  Invokes getString macro to get the user's string of digits. Converts
+  the digits string to numbers and validates input.
+  receives: address of buffer (OFFSET), and size of buffer (SIZEOF)
+  returns: The integer version of the inputted number
+  preconditions: 
+  registers changed: 
+@
+readVal PROC
+
+	push	ebp
+	mov		ebp, esp
+
+	pushad
+
+begin:
+
+	mov		edx, [ebp + 12]	; reference to the buffer variable
+	mov		ecx, [ebp + 8]	; size of buffer pushed to ecx register so it is tracked
+
+; Read the input from the user
+
+	getString	edx, ecx
+
+; Initialize the registers
+	mov		esi, edx
+	mov		eax, 0
+	mov		ecx, 0
+	mov		ebx, 10
+
+; Loading the string incrementally
+
+continueRead:
+	lodsb					; loads from memory at esi
+	cmp		ax, 0			; check to see if the string has terminated
+	je		finish
+
+; Check the range if char is a digit in ASCII
+
+	cmp		ax, 48				; ASCII code 48 relates to the zero (0) digit
+	jb		invalidInput
+	cmp		ax, 57				; ASCII code 57 relates to the nine (9) digit
+	ja		invalidInput
+
+; Adjust for value of digit
+
+	sub		ax, 48
+	xchg	eax, ecx
+	mul		ebx				; multiply by 10 for correct digit place
+	jc		invalidInput
+	jnc		validInput
+
+invalidInput:
+
+	displayString	errMsg
+	call	CrLf
+	displayString	errPrompt
+	jmp				begin
+
+validInput:
+
+	add		eax, ecx
+	xchg	eax, ecx		; Swap references in the two registers
+	jmp		continueRead	; Continue parsing
+	
 finish:
 
-	call	CrLf
+	xchg	ecx, eax
+	mov		DWORD PTR buffer, eax	; Save int in passed variable
+	popad
+	pop ebp
 
-	pop		eax
-	pop		ebx
-	pop		edi
-	pop		edx
-	pop		ebp
+	ret 8
 
-	ret		8
+readVal ENDP
 
-outputArray		ENDP
-
-
-calculateSum	PROC
-
-	push	ebp
-	mov			ebp, esp
-
-	push	eax
-	push	ebx
-	push	edx
-	push	esi
-	push	edi
-
-	mov			edx, [ebp + 12]
-	call	WriteString
-
-	mov			edi, [ebp + 8]
-
-	mov			ebx, 0
-	mov			eax, 0
-
-summingLoop:
-
-	add			eax, [edi + ebx * 4]
-	inc			ebx
-	cmp			ebx, 10
-
-	je			finish
-	jmp			summingLoop
-
-finish:
-
-	mov			esi, [ebp + 20]
-	mov			[esi], eax
-
-	writeVal	[esi], numArray
-
-	call	CrLf
-
-	pop			edi
-	pop			esi
-	pop			edx
-	pop			ecx
-	pop			eax
-	pop			ebp
-
-	ret		16
-
-calculateSum	ENDP
-
-calculateAverage	PROC
+COMMENT @
+  Method that outputs the number to the user after converting the number to ASCII characters
+  receives: number needing to be converted and string reference to write the output to the user
+  returns: none
+  preconditions: none
+  registers changed: ebp, eax, edi, ebx, edx, esp
+@
+writeVal PROC
 
 	push	ebp
+	mov		ebp, esp
+	pushad		; save the registers by pushing them onto the stack
 
-	mov			ebp, esp
-	push	eax
-	push	ebx
-	push	edx
-	push	edi
-	push	esi
+; Initialize the loop to read the inputted number
 
-	mov			edx, [ebp + 12]
-	call	WriteString
+	mov		eax, [ebp + 12]	; move integer value in stack to eax register
+	mov		edi, [ebp + 8]	; move reference to edi to store the output string
+	mov		ebx, 10
+	push	0
 
-	mov			edx, 0
-	mov			ebx, 10
-	mov			edi, [ebp + 24]
+convertNum:
 
-	mov			esi, [ebp + 20]
-	mov			eax, [edi]
-
-	cdq
-
-	div			ebx
-	mov			[esi], eax
-
-	writeVal	[esi], avgMsg
-
-	call	CrLf
-	call	CrLf
-
-	pop		esi
-	pop		edi
-	pop		edx
-	pop		ebx
-	pop		eax
-	pop		ebp
-
-	ret		20
-
-calculateAverage	ENDP
-
-endMessage	PROC
-
-	push	ebp
-	mov			ebp, esp
+	mov		edx, 0
+	div		ebx
+	add		edx, 48
 	push	edx
 
-	mov			edx, [ebp + 8]
+; Check if at end
 
-	call	WriteString
-	call	CrLf
+	cmp		eax, 0
+	jne		convertNum
 
-	pop			edx
-	pop			ebp
+; Pop numbers off the stack
 
-	ret		4
+removeNum:
 
-endMessage	ENDP
+	pop		[edi]
+	mov		eax, [edi]
+	inc		edi
+	cmp		eax, 0				; check if the end
+	jne		removeNum
+
+; Output as string using the macro displayString
+
+	mov				edx, [ebp + 8]
+	displayString	OFFSET strTemp
+
+	popad
+	pop ebp
+
+	ret 8
+
+writeVal ENDP
 
 END main
