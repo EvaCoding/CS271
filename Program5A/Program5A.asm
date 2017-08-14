@@ -70,7 +70,7 @@ ENDM
 	; Data variables
 
 	dataArray		DWORD	10 DUP(0)
-	sum				DWORD	?
+	sum			DWORD	?
 	average			DWORD	?
 	buffer			BYTE	255 DUP (0)
 	strTemp			BYTE	32 DUP (?)
@@ -149,9 +149,9 @@ continueSum:
 	call	WriteVal
 	cmp		ecx, 1					; Checking to see if the last number will be printed
 	je		noCommaNeeded
-	mov			al, ','
+	mov		al, ','
 	call	WriteChar
-	mov			al, ' '
+	mov		al, ' '
 	call	WriteChar
 
 noCommaNeeded:
